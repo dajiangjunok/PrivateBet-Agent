@@ -1,0 +1,144 @@
+// PrivateBet Agent — Prisma schema matching PRD data model
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ────────────────────────────────────────────────────
+
+enum WalletPurpose {
+  deposit
+  privacy_pool
+  betting
+}
+
+enum DepositStatus {
+  received
+  privatizing
+  privatized
+}
+
+enum BetSide {
+  YES
+  NO
+}
+
+enum BetStatus {
+  pending
+  active
+  settled
+}
+
+enum RecommendationType {
+  YES
+  NO
+  SKIP
+}
+
+enum PrivacyOpType {
+  deposit_to_zama
+  withdraw_from_zama
+}
+
+enum PrivacyOpStatus {
+  pending
+  encrypting
+  submitted
+  awaiting_decrypt
+  complete
+  failed
+}
+
+// ── Models ───────────────────────────────────────────────────
+
+model User {
+  tgUserId             BigInt    @id @map("tg_user_id")
+  polygonDepositAddress String?  @map("polygon_deposit_address")
+  zamaAddress          String?   @map("zama_address")
+  mpcUserId            String?   @map("mpc_user_id")
+  settings             Json?
+  createdAt            DateTime  @default(now()) @map("created_at")
+
+  wallets       WalletSubaccount[]
+  deposits      Deposit[]
+  bets          Bet[]
+  privacyOps    PrivacyOperation[]
+
+  @@map("users")
+}
+
+model WalletSubaccount {
+  id        Int          @id @default(autoincrement())
+  userId    BigInt       @map("user_id")
+  address   String
+  chain     String
+  purpose   WalletPurpose
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [tgUserId], onDelete: Cascade)
+
+  @@map("wallets_subaccounts")
+}
+
+model Deposit {
+  id        Int           @id @default(autoincrement())
+  userId    BigInt        @map("user_id")
+  txHash    String        @map("tx_hash")
+  amount    Decimal       @db.Decimal
+  status    DepositStatus @default(received)
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [tgUserId], onDelete: Cascade)
+
+  @@map("deposits")
+}
+
+model Bet {
+  id                 Int       @id @default(autoincrement())
+  userId             BigInt    @map("user_id")
+  marketId           String    @map("market_id")
+  side               BetSide
+  amount             Decimal   @db.Decimal
+  entryPrice         Decimal   @map("entry_price") @db.Decimal
+  status             BetStatus @default(pending)
+  polymarketOrderId  String?   @map("polymarket_order_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [tgUserId], onDelete: Cascade)
+
+  @@map("bets")
+}
+
+model Recommendation {
+  id               Int               @id @default(autoincrement())
+  marketId         String            @map("market_id")
+  generatedAt      DateTime          @map("generated_at")
+  recommendation   RecommendationType
+  confidence       Int
+  reasoning        String
+  llmModelVersion  String            @map("llm_model_version")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  @@map("recommendations")
+}
+
+model PrivacyOperation {
+  id        Int             @id @default(autoincrement())
+  userId    BigInt          @map("user_id")
+  type      PrivacyOpType
+  sourceAddr String         @map("source_addr")
+  destAddr  String          @map("dest_addr")
+  amount    Decimal         @db.Decimal
+  txHashes  Json            @map("tx_hashes")
+  status    PrivacyOpStatus @default(pending)
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [tgUserId], onDelete: Cascade)
+
+  @@map("privacy_operations")
+}

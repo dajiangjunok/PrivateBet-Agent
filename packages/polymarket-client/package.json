@@ -1,0 +1,33 @@
+{
+  "name": "@privatebet/polymarket-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Polymarket CLOB API wrapper",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@polymarket/clob-client": "5.8.1",
+    "@privatebet/shared": "workspace:*",
+    "ethers": "^6.16.0",
+    "viem": "^2.48.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

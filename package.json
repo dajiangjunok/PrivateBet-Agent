@@ -1,0 +1,40 @@
+{
+  "name": "privatebet-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy-preserving Polymarket AI betting agent (PrivateBet Agent) — TypeScript monorepo",
+  "packageManager": "pnpm@10.30.1",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "lint": "eslint \"packages/*/src/**/*.ts\"",
+    "lint:fix": "eslint \"packages/*/src/**/*.ts\" --fix",
+    "format": "prettier --write \"packages/*/src/**/*.ts\" \"*.{json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"packages/*/src/**/*.ts\" \"*.{json,md,yml,yaml}\"",
+    "clean": "pnpm -r exec rm -rf dist node_modules tsconfig.tsbuildinfo",
+    "typecheck": "pnpm -r run typecheck",
+    "postinstall": "prisma generate"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "ethers": "^6.16.0",
+    "prettier": "^3.4.2",
+    "prisma": "^7.8.0",
+    "solc": "^0.8.35",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
+  }
+}
